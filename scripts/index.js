@@ -1,12 +1,12 @@
 // Creamos algunas variables claves para el juego
 
-let espera = 1000 // A menos 'espera', más rápido irá el juego.
+let espera = 500 // A menos 'espera', más rápido irá el juego.
 let score = 0 // La puntuación del ganador.
 
 // Creamos las celdas en las que se moverán los objetos.
 
-const width = 10;
-const height = 10;
+const width = 20;
+const height = width;
 
 const grid = document.querySelector(".grid");
 const marcador = document.querySelector(".puntero")
@@ -39,6 +39,7 @@ const YPosition = height - 1;
 const Xtope = width - 1;
 
 const BalaAltura = height - 2;
+const miniAlien = height - 3
 
 const addJugador = () => cells[YPosition][XPosition].classList.add("jugador");
 const removeJugador = () =>
@@ -178,8 +179,21 @@ for (o = 0; o < longitudinal; o++)
 // Hacemos que los aliens se muevan y ataquen al jugador.
 
 const moverAlien = () => {
-  if ((dirAlien == 1 && derecha == Xtope) || (dirAlien == -1 && izquierda == 0))
-    dirAlien = -dirAlien
+  if ((dirAlien == 1 && derecha == Xtope) || (dirAlien == -1 && izquierda == 0)) {
+    if (abajo == miniAlien)
+      fin()
+    else {
+      dirAlien = -dirAlien
+      abajo++
+      arriba++
+      matrizAlien.forEach(ovni => {
+        removeAlien(ovni.x, ovni.y, ovni.sprite)
+        ovni.y++
+      }
+      )
+      retorno()
+    }
+  }
   else {
     izquierda += dirAlien
     derecha += dirAlien
@@ -188,12 +202,7 @@ const moverAlien = () => {
       ovni.x += dirAlien
     }
     )
-    // Lo hemos puesto aparte para evitar bugs en los que se intenta dibujar un 2º alien en una casilla.
-    matrizAlien.forEach(ovni => {
-      addAlien(ovni.x, ovni.y, ovni.sprite)
-      if (ovni.y == abajo && Math.random() * 10 < ovni.agresivo)
-        bombas.push(new Bomba(ovni.x, ovni.y))
-    })
+    retorno()
   }
   colisionBalaOVNI()
 };
@@ -201,6 +210,15 @@ const moverAlien = () => {
 const quitaAlien = setInterval(() => {
   moverAlien()
 }, espera);
+
+function retorno() {
+  // Lo hemos puesto aparte para evitar bugs en los que se intenta dibujar un 2º alien en una casilla.
+  matrizAlien.forEach(ovni => {
+    addAlien(ovni.x, ovni.y, ovni.sprite)
+    if (ovni.y == abajo && Math.random() * 10 < ovni.agresivo)
+      bombas.push(new Bomba(ovni.x, ovni.y))
+  })
+}
 
 // Ahora crearemos las balas del jugador.
 // Aquí viene lo bueno, pues tenemos que hacer que asciendan y golpeen a los aliens.
@@ -237,6 +255,7 @@ const subidaBala = () => {
   }
   colisionBalaBomba()
   colisionBalaOVNI()
+  colisionBalaBono()
 };
 
 const quitaBala = setInterval(() => {
@@ -287,7 +306,7 @@ const quitaBomba = setInterval(() => {
 // Creamos el objeto.
 
 let bonus = 'N'
-const opciones = ['E', 'R', 'A', 'P', 'D']
+const opciones = ['escudo', 'recarga', 'ascenso', 'potencia', 'dinero']
 
 // Coordenadas del objeto. Solo tiene sentido con el objeto en pantalla.
 
@@ -295,8 +314,27 @@ let bonusX = 0
 let bonusY = 0
 
 // Mostrar o ocultar el bono. No usaremos un sprite, sino una letra.
-const addBono = (x, y) => cells[y][x].innerHTML = bonus;
-const removeBono = (x, y) => cells[y][x].classList.innerHTML = "";
+const addBono = () => cells[bonusY][bonusX].classList.add(bonus);
+const removeBono = () => cells[bonusY][bonusX].classList.remove(bonus);
+
+// El bono descenderá por la pantalla.
+
+function bajadaBono() {
+  if (bonus != "N") {
+    removeBono()
+    if (bonusY < YPosition) {
+      bonusY++
+      addBono()
+      colisionBalaBono()
+    }
+    else
+      bonus = "N"
+  }
+}
+
+const quitaBono = setInterval(() => {
+  bajadaBono()
+}, espera);
 
 // Hora de las colisiones.
 
@@ -328,13 +366,27 @@ function frialdad() {
   if (matrizAlien[frio].ps > 1)
     matrizAlien[frio].ps--
   else {
+    if (bonus == "N" && Math.random() * 5 < matrizAlien[frio].objeto) {
+      premier = true
+      premierX = matrizAlien[frio].x
+      premierY = matrizAlien[frio].y
+    }
+    else
+      premier = false
     score += matrizAlien[frio].puntos
     marcador.innerHTML = "Score: " + score
     removeAlien(matrizAlien[frio].x, matrizAlien[frio].y, matrizAlien[frio].sprite)
     matrizAlien.splice(frio, 1)
     frio--
-    if (matrizAlien.length > 0)
+    if (matrizAlien.length > 0) {
       restaurar()
+      if (premier == true) {
+        bonus = opciones[Math.floor(Math.random() * opciones.length)]
+        bonusX = premierX
+        bonusY = premierY
+        addBono()
+      }
+    }
     else
       fin()
   }
@@ -357,10 +409,25 @@ function colisionBalaOVNI() {
     }
 }
 
+// Colisión bala-objeto.
+
+function colisionBalaBono() {
+  if (bonus != "N")
+    for (g = 0; g < balas.length; g++)
+      if (balas[g].x == bonusX && balas[g].y == bonusY) {
+        removeBono()
+        bonus = "N" // Echamos a perder el bono.
+        removeBala(balas[g].x, balas[g].y)
+        balas.splice(g, 1)
+        g--
+      }
+}
+
 // Tras terminar la partida, paramos los eventos.
 function fin() {
   clearInterval(quitaAlien)
   clearInterval(quitaBala)
   clearInterval(quitaBomba)
+  clearInterval(quitaBono)
   window.removeEventListener('keyup', handleKeyPress)
 }

@@ -38,8 +38,8 @@ body {
 .visor {
   border: 1px solid lightgrey;
   flex-grow: 1;
-  height: 10%;
-  width: 10%;
+  height: 5%;
+  width: 5%;
 }
 
 .jugador,
@@ -48,7 +48,13 @@ body {
 .amarillo,
 .rosa,
 .rojo,
-.bala,.bomba {
+.bala,
+.bomba,
+.escudo,
+.recarga,
+.ascenso,
+.potencia,
+.dinero {
   background-repeat: no-repeat;
   background-size: contain;
   cursor: pointer;
@@ -84,6 +90,25 @@ body {
 
 .bomba {
   background-image: url("../images/bomba.png");
+}
+
+.escudo{
+  background-image: url("../images/E.png");
+}
+
+.recarga{
+  background-image: url("../images/R.png");
+}
+
+.ascenso{
+  background-image: url("../images/A.png");
+}
+
+.potencia{
+  background-image: url("../images/P.png");
+}
+.dinero{
+  background-image: url("../images/D.png");
 }
 
 .puntero{
