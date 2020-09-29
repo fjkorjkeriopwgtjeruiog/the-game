@@ -31,8 +31,8 @@ body {
   flex-wrap: wrap;
   height: 100%;
   justify-content: center;
-  height: 600px;
-  width: 600px;
+  height: 800px;
+  width: 800px;
 }
 
 .visor {
@@ -40,6 +40,10 @@ body {
   flex-grow: 1;
   height: 5%;
   width: 5%;
+}
+
+.panico{
+  background-color: rgb(47, 69, 99);
 }
 
 .jugador,
@@ -54,7 +58,9 @@ body {
 .recarga,
 .ascenso,
 .potencia,
-.dinero {
+.dinero,
+.poder,
+.epilogo {
   background-repeat: no-repeat;
   background-size: contain;
   cursor: pointer;
@@ -62,6 +68,14 @@ body {
 
 .jugador {
   background-image: url("../images/nave.png");
+}
+
+.poder{
+  background-image: url("../images/mejora.png");
+}
+
+.epilogo{
+  background-image: url("../images/roto.png");
 }
 
 .blanco {
@@ -112,6 +126,7 @@ body {
 }
 
 .puntero{
+  text-align: center;
   background-color: purple;
   color: white;
   padding: 20px;
