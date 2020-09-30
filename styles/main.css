@@ -42,7 +42,7 @@ body {
   width: 5%;
 }
 
-.panico{
+.panico {
   background-color: rgb(47, 69, 99);
 }
 
@@ -70,11 +70,11 @@ body {
   background-image: url("../images/nave.png");
 }
 
-.poder{
+.poder {
   background-image: url("../images/mejora.png");
 }
 
-.epilogo{
+.epilogo {
   background-image: url("../images/roto.png");
 }
 
@@ -106,30 +106,34 @@ body {
   background-image: url("../images/bomba.png");
 }
 
-.escudo{
+.escudo {
   background-image: url("../images/E.png");
 }
 
-.recarga{
+.recarga {
   background-image: url("../images/R.png");
 }
 
-.ascenso{
+.ascenso {
   background-image: url("../images/A.png");
 }
 
-.potencia{
+.potencia {
   background-image: url("../images/P.png");
 }
-.dinero{
+.dinero {
   background-image: url("../images/D.png");
 }
 
-.puntero{
+.puntero {
   text-align: center;
   background-color: purple;
   color: white;
   padding: 20px;
   font-size: 20px;
   border: 3px solid white;
+}
+
+#gallo {
+  display: none;
 }
