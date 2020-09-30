@@ -22,6 +22,8 @@ const jugadorDispara = document.getElementById("disparo");
 const rojoDestruido = document.getElementById("roja");
 const premioRecogido = document.getElementById("premio");
 const premioRoto = document.getElementById("roto");
+const apartaBomba = document.getElementById("aparta");
+const ataqueEspecial = document.getElementById("especial");
 
 // Creamos las celdas en las que se moverán los objetos.
 
@@ -64,6 +66,8 @@ const Xtope = width - 1;
 
 const BalaAltura = height - 2;
 
+// Funciones que muestran o ocultan al jugador en pantalla.
+
 const addJugador = () => {
   if (resistencia == false)
     cells[YPosition][XPosition].classList.add("jugador");
@@ -81,11 +85,11 @@ const salud = () => {
   addJugador();
 };
 
+// Permitimos que el jugador se mueva y ataque.
+// Si al moverse el jugador cruza un extremo de la pantalla, reaparecera al otro lado.
+
 const moverJugador = (event) => {
   const { key } = event;
-
-  // Movemos al jugador a la izquierda o a la derecha.
-  // Si cruzamos un extremo de la pantalla, reapareceremos al otro lado.
 
   removeJugador();
 
@@ -104,14 +108,19 @@ const moverJugador = (event) => {
         balas.push(new Bala(BalaAltura));
       }
       break;
+    case "e": // Al pulsar esta tecla, se ejecura en lo que esté en la siguiente.
     case "q":
       if (balas.length == 0 && superAtaque > 0) {
+        ataqueEspecial.play();
         superAtaque--;
         for (u = 0; u < YPosition; u++) balas.push(new Bala(u));
       }
       break;
     case "Enter":
-      pausa();
+      detener();
+      marcador.innerHTML =
+        "Pause! Press Enter to return to the game! Score: " + score;
+      window.addEventListener("keyup", regresar);
   }
 
   addJugador();
@@ -415,11 +424,13 @@ function colisionBombaJugador() {
   }
 }
 
+// Colisión bala-bomba.
+
 function colisionBalaBomba() {
   balas.forEach((bala) => {
-    // Colisión bala-bomba.
     for (u = 0; u < bombas.length; u++)
       if (bala.x == bombas[u].x && bala.y == bombas[u].y) {
+        apartaBomba.play();
         bombas[u].removeBomba();
         bombas.splice(u, 1);
         u--;
@@ -427,31 +438,44 @@ function colisionBalaBomba() {
   });
 }
 
-// Colisión bala-ovni.
+// Comprobamos los daños sufridos por el ovni para ver si debemos destruirlo.
+/*
+  Tras destruir del array el ovni, ya no tendremos acceso a sus datos,
+  por lo que primero veremos si debemos generar un objeto,
+  y luego que lo destruyamos lo generaremos.
+*/
+
 let frio = 0;
 
 function frialdad() {
   if (matrizAlien[frio].ps > 1) matrizAlien[frio].ps--;
   else {
+    if (
+      bonus == "N" &&
+      matrizAlien[frio].y == abajo &&
+      Math.random() * 5 < matrizAlien[frio].objeto
+    ) {
+      premier = true;
+      premierX = matrizAlien[frio].x;
+      premierY = matrizAlien[frio].y;
+    } else premier = false;
     score += matrizAlien[frio].puntos;
     matrizAlien[frio].removeAlien();
     matrizAlien.splice(frio, 1);
     frio--;
     if (matrizAlien.length > 0) {
-      if (
-        bonus == "N" &&
-        matrizAlien[frio].y == abajo &&
-        Math.random() * 5 < matrizAlien[frio].objeto
-      ) {
+      restaurar();
+      if (premier == true) {
         bonus = opciones[Math.floor(Math.random() * opciones.length)];
         bonusX = premierX;
         bonusY = premierY + 1;
         addBono();
       }
-      restaurar();
     } else fin();
   }
 }
+
+// Colisión bala-ovni.
 
 function colisionBalaOVNI() {
   for (o = 0; o < balas.length; o++)
@@ -645,15 +669,6 @@ function detener() {
   clearInterval(quitaBono);
   clearInterval(quitaDatos);
   window.removeEventListener("keyup", moverJugador);
-}
-
-// Pausamos la partida.
-
-function pausa() {
-  detener();
-  marcador.innerHTML =
-    "Pause! Press Enter to return to the game! Score: " + score;
-  window.addEventListener("keyup", regresar);
 }
 
 // Volvemos de la pausa.
