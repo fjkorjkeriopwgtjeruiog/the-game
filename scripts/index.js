@@ -81,7 +81,7 @@ const salud = () => {
   addJugador();
 };
 
-const handleKeyPress = (event) => {
+const moverJugador = (event) => {
   const { key } = event;
 
   // Movemos al jugador a la izquierda o a la derecha.
@@ -109,6 +109,9 @@ const handleKeyPress = (event) => {
         superAtaque--;
         for (u = 0; u < YPosition; u++) balas.push(new Bala(u));
       }
+      break;
+    case "Enter":
+      pausa();
   }
 
   addJugador();
@@ -430,27 +433,22 @@ let frio = 0;
 function frialdad() {
   if (matrizAlien[frio].ps > 1) matrizAlien[frio].ps--;
   else {
-    if (
-      bonus == "N" &&
-      matrizAlien[frio].y == abajo &&
-      Math.random() * 5 < matrizAlien[frio].objeto
-    ) {
-      premier = true;
-      premierX = matrizAlien[frio].x;
-      premierY = matrizAlien[frio].y;
-    } else premier = false;
     score += matrizAlien[frio].puntos;
     matrizAlien[frio].removeAlien();
     matrizAlien.splice(frio, 1);
     frio--;
     if (matrizAlien.length > 0) {
-      restaurar();
-      if (premier == true) {
+      if (
+        bonus == "N" &&
+        matrizAlien[frio].y == abajo &&
+        Math.random() * 5 < matrizAlien[frio].objeto
+      ) {
         bonus = opciones[Math.floor(Math.random() * opciones.length)];
         bonusX = premierX;
         bonusY = premierY + 1;
         addBono();
       }
+      restaurar();
     } else fin();
   }
 }
@@ -563,12 +561,7 @@ function mostrada() {
 
 // Tras terminar la partida, paramos los eventos.
 function fin() {
-  clearInterval(quitaAlien);
-  clearInterval(quitaBala);
-  clearInterval(quitaBomba);
-  clearInterval(quitaBono);
-  clearInterval(quitaDatos);
-  window.removeEventListener("keyup", handleKeyPress);
+  detener();
 
   // ¿Ganaste o perdiste?
 
@@ -640,5 +633,35 @@ function chrono() {
     bajadaBono();
   }, espera);
 
-  window.addEventListener("keyup", handleKeyPress);
+  window.addEventListener("keyup", moverJugador);
+}
+
+// Función que para el juego.
+
+function detener() {
+  clearInterval(quitaAlien);
+  clearInterval(quitaBala);
+  clearInterval(quitaBomba);
+  clearInterval(quitaBono);
+  clearInterval(quitaDatos);
+  window.removeEventListener("keyup", moverJugador);
+}
+
+// Pausamos la partida.
+
+function pausa() {
+  detener();
+  marcador.innerHTML =
+    "Pause! Press Enter to return to the game! Score: " + score;
+  window.addEventListener("keyup", regresar);
+}
+
+// Volvemos de la pausa.
+
+function regresar(event) {
+  const { key } = event;
+  if (key == "Enter") {
+    window.removeEventListener("keyup", regresar);
+    chrono();
+  }
 }
