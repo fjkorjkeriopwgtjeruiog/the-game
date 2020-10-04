@@ -40,9 +40,10 @@ for (b = 0; b < size; b++) {
   for (a = 0; a < size; a++) {
     const cell = document.createElement('div');
     cell.classList.add('visor');
-    if (b == miniAlien)
-      // Indicamos la zona de peligro que los OVNIs no deben descender.
+    if (b == miniAlien) // Indicamos la zona de peligro que los OVNIs no deben descender.
       cell.classList.add('panico');
+    else
+      cell.classList.add('calma')
     grid.appendChild(cell);
     limpio.push(cell);
   }

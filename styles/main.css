@@ -14,11 +14,14 @@ picture {
 
 body {
   font-size: 100%;
-  background-color: black;
+  background-image: url("../images/estrella.jpg");
+}
+
+.grid-reaper{
+  height: 100vh;
 }
 
 .grid-wrapper {
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -44,6 +47,10 @@ body {
 
 .panico {
   background-color: rgb(47, 69, 99);
+}
+
+.calma{
+  background-color: black;
 }
 
 .jugador,
